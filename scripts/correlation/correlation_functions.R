@@ -1,3 +1,4 @@
+# Determines the total number of transcripts (as number of rows) present in a list of files.
 GetNTranscripts <- function(file_list){
   file_nrows <- vector(mode='integer', length=length(file_list))
   n_transcripts = 0
@@ -13,12 +14,14 @@ GetNTranscripts <- function(file_list){
   return(n_transcripts)
 }
 
+# Initializes a data frame with a defined number of rows.
 InitializeMeansDF <- function(n_row){
   df <- data.frame(matrix(ncol = 0, nrow = n_row))
   return(df)
 }
 
-CalculatePopulationMeans <- function(file, min_population = NULL){
+# Calculates and returns population means per row from a file.
+CalculatePopulationMeans <- function(file){
   cancer_type = str_replace(file, '.Rdata', '')
   f <- load(paste(data_dir, file, sep=''))
   df <- as.data.frame(matrix(unlist(get(f)), nrow = nrow(get(f)), ncol = ncol(get(f))))
