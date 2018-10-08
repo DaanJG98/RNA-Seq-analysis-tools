@@ -1,54 +1,62 @@
 #####################################################################
 
-# LOAD PACKAGES
+# INSTALL AND LOAD PACKAGES
 
+packages <- c('cluster', 'factoextra', 'data.table', 'corrplot', 'clValid', 'tidyverse')
+for(package in packages){
+  if(is.element(package, installed.packages()[,1])==FALSE){
+    install.packages(package)
+  }
+}
 library(cluster)
 library(factoextra)
 library(data.table)
 library(corrplot)
 library(clValid)
 library(tidyverse)
-library(miceadds)
 
-####################################################################
+# LOAD LOCATIONS
+
+base_dir <- 'LOCATION//RNA-Seq-analysis-tools-develop'
+  # Set base_dir to the specific folder where this repository is stored on your computer!
+script_dir <- paste(base_dir, '//scripts//correlation', sep='')
+data_dir <- paste(base_dir, '//example_data//', sep='')
+
+# LOAD FUNCTIONS
+
+setwd(script_dir)
+source('correlation_functions.r')
 
 # LOAD DATAFRAMES
 
-base_dir <- "C:\\Users\\daan\\Documents\\week6_8\\DATA\\"
-file_list <- c("BLCA.Rdata", "BRCA.Rdata")
-# file_list <- list.files(base_dir)
+file_list <- list.files(data_dir)
 
-prepDataframe <- function(file){
-  x <- load(paste(base_dir,file, sep=""))
-  df <- as.data.frame(matrix(unlist(get(x)), nrow = nrow(get(x))), col.names=names(get(x)), row.names = rownames(get(x)))
-  df[is.na(df)] <- 0
-  name = replace(file, ".Rdata", "")
-  df$avg = apply(df,1,mean,na.rm=FALSE)
-  colnames(df)[colnames(df) == "avg"] <- name
-  print(head(df))
-  return (df[, ncol(df)])
-}
+# SET GLOBAL VARIABLES
 
+N_TRANSCRIPTS = GetNTranscripts(file_list)
+population_means <- InitializeMeansDF(N_TRANSCRIPTS)
+
+####################################################################
+
+# CALCULATE POPULATION MEANS
 
 for (file in file_list){
-  
-  
-  temp_avg <- prepDataframe(file)
-  # print(head(temp_avg))
-  # load.Rdata(paste(base_dir,file, sep=""), file)
+  file_population_mean <- CalculatePopulationMeans(file)
+  population_means <- cbind(population_means, file_population_mean)
 }
 
-data_array <- c(data.BLCA, data.BRCA, data.CESC, data.CHOL, data.COAD, data.ESCA, data.HNSC, data.KICH, data.KIRC, data.KIRP, data.LIHC, data.LUAD, data.LUSC, data.PAAD, data.PCPG, data.PRAD, data.READ, data.STAD, data.THCA, data.UCEC)
+# PERFORM AND PLOT PCA FOR ALL CANCER TYPES
 
-rowMeans(data.BLCA, na.rm = FALSE, dims = 1)
+cancer_types_pca <- prcomp(population_means, center = TRUE, scale. = TRUE) 
+plot(cancer_types_pca, type = 'l')
+fviz_eig(cancer_types_pca)
 
-data.BLCA %>% mutate(BLCA = rowMeans(.))
+fviz_pca_var(cancer_types_pca,
+             col.var = 'contrib',
+             geom = c('point', 'text'),
+             gradient.cols = c('#00AFBB', '#E7B800', '#FC4E07'),
+             pointsize = 3,
+             repel = TRUE
+)
 
-
-df <- as.data.frame(matrix(unclass(data.BLCA), nrow = nrow(data.BLCA)), col.names=names(data.BLCA), row.names = rownames(data.BLCA))
-df[is.na(df)] <- 0
-df$avg = apply(df,1,mean,na.rm=FALSE)
-
-
-
-
+####################################################################
