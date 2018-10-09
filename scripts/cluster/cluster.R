@@ -15,8 +15,7 @@ library(clValid)
 
 # LOAD LOCATIONS
 
-# base_dir <- ''
-base_dir <- 'C://Users//Koen//Documents//RNA-Seq-analysis-tools'
+ base_dir <- ''
   # Set base_dir to the specific folder where this repository is stored on your computer!
 script_dir <- paste(base_dir, '//scripts//cluster', sep='')
 data_dir <- paste(base_dir, '//example_data//', sep='')
@@ -26,90 +25,41 @@ data_dir <- paste(base_dir, '//example_data//', sep='')
 setwd(script_dir)
 source('cluster_functions.r')
 
-# LOAD DATAFRAMES
-
-# file_list <- list.files(data_dir)
-file_list <- c('KIRC.Rdata', 'KIRP.Rdata', 'LUAD.Rdata', 'LUSC.Rdata', 'COAD.Rdata', 'THCA.Rdata')
-
 # SET GLOBAL VARIABLES
 
 MIN_N_PATIENTS = 10
+MAX_CLUSTER_MULTIPLIER = 4
+FOLD_CHANGE <- 1.5
+CLUSTERING_METHODS <- c('hierarchical', 'kmeans', 'pam')
 cancer_data <- data.frame()
 patient_data <- data.frame()
-# d.cancer <- data.frame()
+
+# LOAD DATAFRAMES
+
+file_list <- 
+  # Set file_list to a custom selection of files or to all using 'list.files(data_dir)' (not advised due to size)!
 
 ####################################################################
 
 # LOAD AND COMBINE CANCER DATA
 
-
 for (file in file_list){
-  LoadCancerData(file)
+  cancer_data <- LoadCancerData(file)
 }
 
-# Apply fold change filter
-fc <- 1.5 # GLOBAL VAR
-sel <- apply(d.cancer, MARGIN = 1, FUN = function(x) any(abs(x)>fc))
-d.cancer <- d.cancer[sel,]
+# APPLY FOLD CHANGE FILTER
 
-
-
+cancer_data <- FoldChangeFilter(cancer_data)
 
 # TRANSPOSE DATA
+
 patient_data <- t(cancer_data)
-# d.patient <- t(d.cancer)
 
-evaluation <- clValid(d.patient, nClust = 2:4, 
-                      clMethods = c("hierarchical","kmeans","pam"),
-                      validation = "internal")
-top_evaluation <- optimalScores(evaluation)
-top_evaluation <- top_evaluation[which.max(top_evaluation$Score),]
-print(top_evaluation)
+# EVALUATE BEST CLUSTERING METHOD(S) (AVOID WITH LARGE NUMBER OF DATA SETS)
 
-# Summary
-summary(intern)
-# oS <- optimalScores(intern)
-# oS[which.max(oS$Score),]
-# 2 = method, 3 = n clusters
+evaluation <- clValid(patient_data, nClust = 2:(length(file_list)*MAX_CLUSTER_MULTIPLIER), 
+                      clMethods = CLUSTERING_METHODS,
+                      validation = 'internal')
+optimal_methods <- GetOptimalMethods(evaluation)
 
-
-
-
-
-### k-means clustering
-km.res <- kmeans(d.patient, 2, nstart = 25)
-fviz_cluster(km.res, data = d.patient, ellipse.type = "norm", labelsize = 8)
-
-
-### Partioning clustering
-pam.res <- pam(d.patient, 2)
-fviz_cluster(pam.res)
-
-
-### Hierarchical clustering - 1
-d <- dist(d.patient, method = "euclidean")
-res.hc <- hclust(d, method = "ward.D2" )
-
-ct.n <- cutree(res.hc, k = 2)
-
-plot(res.hc, cex=0.5) 
-rect.hclust(res.hc, k = 2) 
-
-### Hierarchical clustering - 2
-res <- hcut(d.patient, k = 5, stand = TRUE)
-fviz_dend(res, rect = TRUE, cex = 0.1)
-
-
-###################################
-#
-# Step 8. Check cluster results
-#
-
-intern <- clValid(d.patient, nClust = 2:4, 
-                  clMethods = c("hierarchical","kmeans","pam"),
-                  validation = "internal")
-# Summary
-summary(intern)
-# oS <- optimalScores(intern)
-# oS[which.max(oS$Score),]
-# 2 = method, 3 = n clusters
+#####################################################################
