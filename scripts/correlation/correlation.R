@@ -17,7 +17,7 @@ library(tidyverse)
 
 # LOAD LOCATIONS
 
-base_dir <- 'LOCATION//RNA-Seq-analysis-tools-develop'
+base_dir <- ''
   # Set base_dir to the specific folder where this repository is stored on your computer!
 script_dir <- paste(base_dir, '//scripts//correlation', sep='')
 data_dir <- paste(base_dir, '//example_data//', sep='')
