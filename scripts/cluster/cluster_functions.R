@@ -16,7 +16,7 @@ LoadCancerData <- function(file){
   return(cancer_data)
 }
 
-  # Filter out data below a given fold change.
+# Filter out data below a given fold change.
 FoldChangeFilter <- function(data, fc = FOLD_CHANGE){
   selection <- apply(data, MARGIN = 1, FUN = function(x) any(abs(x)>fc))
   result <- data[selection,]
@@ -61,14 +61,16 @@ RunOptimalMethods <- function(methods, data){
     method <- m[1]
     n <- as.integer(m[2])
     
-    # TO-DO: Display plots OR return which functions and parameters to call alternatively.
+    print(paste('Advised method:', method, 'clustering with n =', as.character(n)))
     
-    # if(method == 'hierarchical'){
-    #   HierarchicalClustering(data, n)
-    # } else if(method == 'kmeans'){
-    #   KMeansClustering(data, n)
-    # } else if(method == 'pam'){
-    #   PartioningClustering(data, n)
-    # }
+    if(method == 'hierarchical'){
+      print('Run the following line to perform this method: HierarchicalClustering(data, n)')
+    } else if(method == 'kmeans'){
+      print('Run the following line to perform this method: KMeansClustering(data, n)')
+    } else if(method == 'pam'){
+      print('Run the following line to perform this method: PartioningClustering(data, n)')
+    }
+    
+    # TO-DO: Automatically run functions based on methods
   }
 }
