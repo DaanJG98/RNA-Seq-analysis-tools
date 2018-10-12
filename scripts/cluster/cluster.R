@@ -15,8 +15,8 @@ library(clValid)
 
 # LOAD LOCATIONS
 
- base_dir <- ''
-  # Set base_dir to the specific folder where this repository is stored on your computer!
+base_dir <- 'C://Users//Koen//Documents//RNA-Seq-analysis-tools-feature-classifier'
+# Set base_dir to the specific folder where this repository is stored on your computer!
 script_dir <- paste(base_dir, '//scripts//cluster', sep='')
 data_dir <- paste(base_dir, '//example_data//', sep='')
 
@@ -36,10 +36,10 @@ patient_data <- data.frame()
 
 # LOAD DATAFRAMES
 
-file_list <- 
+file_list <- c('COAD.Rdata', 'READ.Rdata')
   # Set file_list to a custom selection of files or to all using 'list.files(data_dir)' (not advised due to size)!
-
-####################################################################
+  
+  ####################################################################
 
 # LOAD AND COMBINE CANCER DATA
 
@@ -61,5 +61,6 @@ evaluation <- clValid(patient_data, nClust = 2:(length(file_list)*MAX_CLUSTER_MU
                       clMethods = CLUSTERING_METHODS,
                       validation = 'internal')
 optimal_methods <- GetOptimalMethods(evaluation)
+RunOptimalMethods(optimal_methods, patient_data)
 
 #####################################################################
