@@ -25,16 +25,13 @@ FoldChangeFilter <- function(data, fc = FOLD_CHANGE){
 
 # Append labels to dataframe
 AppendLabels <- function(df, label_list){
-  temp <- c(mode='character', length = nrow(df))
+  labels <- c(mode='character', length = nrow(df))
   index = 1
   for (patient in rownames(df)){
     cancer_type <- tail(strsplit(x = patient, split = "-")[[1]], 1)
-    # APPEND label TO temo
-    
-    temp[index] = label_list[[cancer_type]]
-    #df[patient,]$label = label_list$cancer_type
+    labels[index] = label_list[[cancer_type]]
     index = index+1
   }
-  df$label = temp
+  df$label = labels
   return(df)
 }
