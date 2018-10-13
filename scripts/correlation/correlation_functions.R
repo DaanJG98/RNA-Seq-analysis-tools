@@ -1,0 +1,59 @@
+# Determines the total number of transcripts (as number of rows) present in a list of files.
+GetNTranscripts <- function(file_list){
+  file_nrows <- vector(mode='integer', length=length(file_list))
+  n_transcripts = 0
+  for (i in 1:length(file_list)){
+    f <- load(paste(data_dir, file_list[i], sep=''))
+    file_nrows[i] = nrow(get(f))
+  }
+  if (all(file_nrows == file_nrows[1])){
+    n_transcripts = file_nrows[1]
+  } else {
+    n_transcripts = max(file_nrows)
+  }
+  return(n_transcripts)
+}
+
+# Initializes a data frame with a defined number of rows.
+InitializeMeansDF <- function(n_row){
+  df <- data.frame(matrix(ncol = 0, nrow = n_row))
+  return(df)
+}
+
+# Calculates and returns population means per row from a file.
+CalculatePopulationMeans <- function(file){
+  cancer_type = str_replace(file, '.Rdata', '')
+  f <- load(paste(data_dir, file, sep=''))
+  df <- as.data.frame(matrix(unlist(get(f)), nrow = nrow(get(f)), ncol = ncol(get(f))))
+  rownames(df) = rownames(get(f))
+  colnames(df) = colnames(get(f))
+  df[is.na(df)] <- 0
+  df$avg = apply(df, 1, mean, na.rm = FALSE)
+  result <- subset(df, select = 'avg')
+  names(result)[names(result) == 'avg'] <- cancer_type
+  return(result)
+}
+
+# Create correlation plot for two dimensions
+CreateCorrPlot(dataFrame){
+  
+  #TODO add check for only two dimensions
+  
+  # correlation
+  corr.cancer <- cor( dataFrame )
+  
+  # test significance of correlation
+  test.cancer <- cor.mtest( dataFrame, conf.level=0.95 )
+  
+  # plot as corrplot
+  corrplot( corr.cancer, p.mat=test.cancer$p, sig.level=0.05, type = "upper", order = "hclust", tl.col = "black", tl.srt = 45, tl.cex=0.6)
+}
+
+# Create heatmap
+CreateHeatmap(dataFrame){
+  # correlation
+  corr.cancer <- cor( dataFrame )
+  
+  # heatmap
+  heatmap( corr.cancer )
+}
