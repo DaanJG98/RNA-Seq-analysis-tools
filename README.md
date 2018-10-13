@@ -8,6 +8,5 @@ This repository contains several components, all focus on different tasks. Compo
 | Component      | Description                                | Status      |
 | :------------- | :----------------------------------------- | :---------- |
 | Correlation    | Determine correlation between cancer types | In progress |
-| Clustering     | Cluster different types of cancer          | Unstarted   |
-| Classification | Build a model to classify cancer types     | Unstarted   |
-
+| Clustering     | Cluster different types of cancer          | In progress |
+| Classification | Build a model to classify cancer types     | In progress |
