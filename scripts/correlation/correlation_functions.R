@@ -33,3 +33,27 @@ CalculatePopulationMeans <- function(file){
   names(result)[names(result) == 'avg'] <- cancer_type
   return(result)
 }
+
+# Create correlation plot for two dimensions
+CreateCorrPlot(dataFrame){
+  
+  #TODO add check for only two dimensions
+  
+  # correlation
+  corr.cancer <- cor( dataFrame )
+  
+  # test significance of correlation
+  test.cancer <- cor.mtest( dataFrame, conf.level=0.95 )
+  
+  # plot as corrplot
+  corrplot( corr.cancer, p.mat=test.cancer$p, sig.level=0.05, type = "upper", order = "hclust", tl.col = "black", tl.srt = 45, tl.cex=0.6)
+}
+
+# Create heatmap
+CreateHeatmap(dataFrame){
+  # correlation
+  corr.cancer <- cor( dataFrame )
+  
+  # heatmap
+  heatmap( corr.cancer )
+}
